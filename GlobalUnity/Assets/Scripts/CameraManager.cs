@@ -57,8 +57,6 @@ public class CameraManager : MonoBehaviour
                 gameObject.transform.position = Vector3.Slerp(farAwayPoint, targetPoint, this.zoomLevel);
 
             }
-           
-            Debug.Log(this.zoomLevel);
 
         }
 
