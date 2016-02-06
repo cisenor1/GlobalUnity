@@ -12,9 +12,16 @@ public class EarthMap : MonoBehaviour
     private Vector3 northPole;
     private Vector3 southPole;
 
+    public LineRenderer lineRenderer;
+    int circleGran;
+    float theta_scale = 0.01f;
+
     // Use this for initialization
     void Start()
     {
+        //initialize line renderer
+        initLineRenderer();
+
         // resize vertical scale of earth.
         MeshCollider coll = GetComponent<MeshCollider>();
         coll.sharedMesh = GetComponent<MeshFilter>().mesh;
@@ -53,6 +60,24 @@ public class EarthMap : MonoBehaviour
             x.name = i + ",90";
             x.transform.parent = this.equator.transform;
         }
+
+        //draw equator as 3D line segment - maybe it would be better to huse a texture with lat/long grid... we'll see
+        Vector3 pos;
+        float theta = 0f;
+
+        float radius = 12726.0f / 2.0f;
+        for (int i = 0; i < circleGran; i++)
+        {
+            theta += (2.0f * Mathf.PI * theta_scale);
+            float x = radius * Mathf.Cos(theta);
+            float y = radius * Mathf.Sin(theta);
+            x += gameObject.transform.position.x;
+            y += gameObject.transform.position.y;
+            pos = new Vector3(y, x, 0);
+            lineRenderer.SetPosition(i, pos);
+        }
+
+
     }
 
     // Update is called once per frame
@@ -60,4 +85,19 @@ public class EarthMap : MonoBehaviour
     {
 
     }
+
+    private void initLineRenderer()
+    {
+        float circleGranf = (2.0f * Mathf.PI) / theta_scale;
+        circleGran = (int)circleGranf;
+        circleGran++;
+        lineRenderer = gameObject.GetComponent<LineRenderer>();
+
+
+        lineRenderer.SetVertexCount(circleGran);
+    }
+
+    
+
+
 }
