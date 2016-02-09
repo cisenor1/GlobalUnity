@@ -2,35 +2,38 @@
 using System.Collections;
 using System;
 
-public class MapInit : MonoBehaviour {
+public class MapInit : MonoBehaviour
+{
 
     public float MinHeight;
     public float MaxHeight;
+    public float HeightFactor = 10;
+    public Texture2D InTexture;
     private Mesh mesh;
 
-	// Use this for initialization
-	void Start () {
-        //mesh = CreateMesh(20, 20, 40, 40, false);
-        //gameObject.GetComponent<MeshFilter>().mesh = mesh;
+
+    // Use this for initialization
+    void Start()
+    {
         var m = gameObject.GetComponent<MeshFilter>().mesh;
         m.Clear();
-        
+
         FillMesh(m, 250, 250, false);
-        
-        //gameObject.AddComponent<MeshRenderer>();
+        gameObject.GetComponent<MeshCollider>().sharedMesh = m;
     }
-    
+
     // Update is called once per frame
-    void Update () {
+    void Update()
+    {
 
     }
-    
-    void FillMesh(Mesh m, int widthSegments, int lengthSegments, bool twoSided, string name="PLANEMESH")
+
+    void FillMesh(Mesh m, int widthSegments, int lengthSegments, bool twoSided, string name = "PLANEMESH")
     {
         // Top-left
         //Vector2 anchorOffset = new Vector2(-width / 2.0f, length / 2.0f);
         // Center
-        
+
         Vector2 anchorOffset = Vector2.zero;
         int hCount2 = widthSegments + 1;
         int vCount2 = lengthSegments + 1;
@@ -52,11 +55,21 @@ public class MapInit : MonoBehaviour {
         float uvFactorY = 1.0f / lengthSegments;
         //float scaleX = width / widthSegments;
         //float scaleY = length / lengthSegments;
+        var range = MaxHeight - MinHeight;
+        var totalPixelsX = InTexture.width;
+        var totalPixelsY = InTexture.height;
+        var xStep = totalPixelsX / hCount2;
+        var yStep = totalPixelsY / vCount2;
+
         for (float y = 0.0f; y < vCount2; y++)
         {
+            var yVal = Convert.ToInt32(y * yStep);
             for (float x = 0.0f; x < hCount2; x++)
             {
-                vertices[index] = new Vector3(x - anchorOffset.x, UnityEngine.Random.Range(MinHeight, MaxHeight), y - anchorOffset.y);
+                var xVal = Convert.ToInt32(x * xStep);
+                var color = InTexture.GetPixel(xVal, yVal);
+                var height = color.r / 255 * range;
+                vertices[index] = new Vector3(x - anchorOffset.x, height * HeightFactor, y - anchorOffset.y);
                 tangents[index] = tangent;
                 uvs[index++] = new Vector2(x * uvFactorX, y * uvFactorY);
             }
